@@ -106,8 +106,8 @@ mini-erp-crm/
 
 1. Clone the repository and navigate to the project directory:
    ```bash
-   git clone https://github.com/your-repo/mini-erp-crm.git
-   cd mini-erp-crm
+   git clone https://github.com/khwahish-pandey/opsera-business-hub.git
+cd opsera-erp-crm
    ```
 
 2. Spin up PostgreSQL, Backend, and Frontend containers:
