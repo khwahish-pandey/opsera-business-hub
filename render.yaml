@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: nexora-backend
+    runtime: node
+    rootDir: backend
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npx prisma db push && node dist/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        value: file:/data/nexora.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: FRONTEND_URL
+        value: https://nexora-operations-portal.vercel.app
+    disk:
+      name: nexora-sqlite-data
+      mountPath: /data
+      sizeGB: 1

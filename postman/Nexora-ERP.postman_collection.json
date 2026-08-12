@@ -1,0 +1,401 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-1234567890ef",
+    "name": "NEXORA ERP REST API Collection",
+    "description": "Postman Collection for NEXORA ERP - Wholesale Operations & Customer Management Portal.\nIncludes Authentication, Customer CRM, Products Catalog, Inventory Management, Sales Challans (Draft/Confirm/Cancel), Dashboard & Reports.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('authToken', jsonData.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@nexora.com\",\n  \"password\": \"Admin@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login (Sales)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sales@nexora.com\",\n  \"password\": \"Sales@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer CRM",
+      "item": [
+        {
+          "name": "Get Customers List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/customers?page=1&limit=10&search=&status=&customerType=",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "" },
+                { "key": "status", "value": "" },
+                { "key": "customerType", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Vikas Trading Co\",\n  \"mobile\": \"+919988112233\",\n  \"email\": \"vikas@trading.in\",\n  \"businessName\": \"Vikas Trading Company\",\n  \"gstNumber\": \"07AAAAA9999A1Z2\",\n  \"customerType\": \"WHOLESALE\",\n  \"address\": \"102 Main Wholesale Market, Delhi 110006\",\n  \"status\": \"ACTIVE\",\n  \"notes\": \"New wholesale account\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers"]
+            }
+          }
+        },
+        {
+          "name": "Add Follow-up Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Discussed annual contract renewal and volume rebates.\",\n  \"followUpDate\": \"2026-08-20T10:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/customers/CUSTOMER_ID_HERE/followups",
+              "host": ["{{baseUrl}}"],
+              "path": ["customers", "CUSTOMER_ID_HERE", "followups"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products Catalog",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/products?page=1&limit=10&search=&category=&lowStock=false",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Industrial Safety Gloves Box\",\n  \"sku\": \"HRD-GLV-IND\",\n  \"category\": \"Hardware\",\n  \"unitPrice\": 450,\n  \"currentStock\": 100,\n  \"minimumStock\": 20,\n  \"warehouseLocation\": \"Rack S-05\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventory & Stock Operations",
+      "item": [
+        {
+          "name": "Stock IN Adjustment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 25,\n  \"reason\": \"Vendor restock shipment received\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inventory/PRODUCT_ID_HERE/in",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "PRODUCT_ID_HERE", "in"]
+            }
+          }
+        },
+        {
+          "name": "Stock OUT Adjustment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 5,\n  \"reason\": \"Sample dispatch to regional branch\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/inventory/PRODUCT_ID_HERE/out",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "PRODUCT_ID_HERE", "out"]
+            }
+          }
+        },
+        {
+          "name": "Get Stock Movement Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/inventory/movements?page=1&limit=15",
+              "host": ["{{baseUrl}}"],
+              "path": ["inventory", "movements"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sales Challans",
+      "item": [
+        {
+          "name": "Create Draft Challan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": \"CUSTOMER_ID_HERE\",\n  \"items\": [\n    {\n      \"productId\": \"PRODUCT_ID_HERE\",\n      \"quantity\": 2\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/challans",
+              "host": ["{{baseUrl}}"],
+              "path": ["challans"]
+            }
+          }
+        },
+        {
+          "name": "Confirm Challan (Reduces Stock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/challans/CHALLAN_ID_HERE/confirm",
+              "host": ["{{baseUrl}}"],
+              "path": ["challans", "CHALLAN_ID_HERE", "confirm"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Challan (Restores Stock)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/challans/CHALLAN_ID_HERE/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["challans", "CHALLAN_ID_HERE", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard & Reports",
+      "item": [
+        {
+          "name": "Get Dashboard Overview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Get Sales & Inventory Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

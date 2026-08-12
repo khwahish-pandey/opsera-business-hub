@@ -1,0 +1,152 @@
+// Prisma Schema for NEXORA ERP - SQLite Database Configuration
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("SALES")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  challans       Challan[]
+  followUps      FollowUp[]
+  stockMovements StockMovement[]
+
+  @@map("users")
+}
+
+model Customer {
+  id           String    @id @default(uuid())
+  customerName String
+  mobile       String
+  email        String
+  businessName String
+  gstNumber    String?
+  customerType String    @default("WHOLESALE")
+  address      String
+  status       String    @default("ACTIVE")
+  followUpDate DateTime?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  challans  Challan[]
+  followUps FollowUp[]
+
+  @@index([mobile])
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("customers")
+}
+
+model FollowUp {
+  id           String   @id @default(uuid())
+  customerId   String
+  note         String
+  followUpDate DateTime
+  createdById  String
+  createdAt    DateTime @default(now())
+
+  customer  Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  createdBy User     @relation(fields: [createdById], references: [id])
+
+  @@index([customerId])
+  @@map("follow_ups")
+}
+
+model Product {
+  id                String   @id @default(uuid())
+  name              String
+  sku               String   @unique
+  category          String
+  unitPrice         Float
+  currentStock      Int
+  minimumStock      Int
+  warehouseLocation String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  stockMovements StockMovement[]
+  challanItems   ChallanItem[]
+
+  @@index([sku])
+  @@index([category])
+  @@map("products")
+}
+
+model StockMovement {
+  id           String   @id @default(uuid())
+  productId    String
+  quantity     Int
+  movementType String
+  reason       String
+  createdById  String
+  createdAt    DateTime @default(now())
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdBy User    @relation(fields: [createdById], references: [id])
+
+  @@index([productId])
+  @@index([movementType])
+  @@index([createdAt])
+  @@map("stock_movements")
+}
+
+model Challan {
+  id            String   @id @default(uuid())
+  challanNumber String   @unique
+  customerId    String
+  totalQuantity Int
+  totalAmount   Float
+  status        String   @default("DRAFT")
+  createdById   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customer  Customer      @relation(fields: [customerId], references: [id])
+  createdBy User          @relation(fields: [createdById], references: [id])
+  items     ChallanItem[]
+
+  @@index([challanNumber])
+  @@index([customerId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("challans")
+}
+
+model ChallanItem {
+  id                  String   @id @default(uuid())
+  challanId           String
+  productId           String?
+  productNameSnapshot String
+  skuSnapshot         String
+  unitPriceSnapshot   Float
+  quantity            Int
+  totalPrice          Float
+
+  challan Challan  @relation(fields: [challanId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([challanId])
+  @@map("challan_items")
+}
+
+model ChallanSequence {
+  id        String   @id @default("CHALLAN_SEQ")
+  year      Int      @unique
+  lastValue Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@map("challan_sequences")
+}
